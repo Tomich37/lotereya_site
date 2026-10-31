@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#130e2c">
+  <title>Счастливый бочонок — автономная лотерея</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Счастливый бочонок — наверх">
+      <span class="brand-mark">Б</span>
+      <span><b>Счастливый бочонок</b><small>Лотерея для вашей компании</small></span>
+    </a>
+    <div class="offline-badge"><span></span> Работает без интернета</div>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Честный розыгрыш без регистрации</p>
+        <h1>Добавьте людей.<br><em>Крутите бочонок.</em></h1>
+        <p class="hero-copy">Количество билетов влияет на шанс, пустые бочонки добавляют интригу, а правила каждого приза настраиваются отдельно.</p>
+      </div>
+      <div class="hero-stats" aria-label="Статистика лотереи">
+        <div><strong id="peopleCount">0</strong><span>участников</span></div>
+        <div><strong id="ticketCount">0</strong><span>билетов</span></div>
+        <div><strong id="presentCount">0</strong><span>пришли</span></div>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <section class="panel participants-panel">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>Участники</h2></div>
+          <div class="heading-actions">
+            <button class="text-button" id="demoButton" type="button">Пример</button>
+            <button class="text-button danger-text" id="clearButton" type="button">Очистить</button>
+          </div>
+        </div>
+
+        <form class="add-form" id="participantForm">
+          <label class="field grow"><span>Имя участника</span><input id="participantName" required maxlength="60" autocomplete="off" placeholder="Например, Анна"></label>
+          <label class="field tickets-field"><span>Билетов</span><input id="participantTickets" type="number" min="1" max="999" value="1" required></label>
+          <label class="present-check"><input id="participantPresent" type="checkbox" checked><span>Пришёл</span></label>
+          <button class="button secondary" type="submit">Добавить</button>
+        </form>
+
+        <div class="empty-state" id="emptyState">
+          <span class="empty-icon">✦</span>
+          <h3>Список пока пуст</h3>
+          <p>Добавьте участников вручную или загрузите пример, чтобы посмотреть механику.</p>
+        </div>
+
+        <div class="participant-list" id="participantList" aria-live="polite"></div>
+
+        <details class="bulk-box">
+          <summary>Быстро добавить списком</summary>
+          <p>Одна строка — один человек. Формат: <code>Имя; билеты; пришёл</code></p>
+          <textarea id="bulkInput" rows="5" placeholder="Анна; 5; да&#10;Михаил; 1; нет&#10;Сергей; 3; да"></textarea>
+          <button class="button quiet" id="bulkButton" type="button">Добавить список</button>
+        </details>
+      </section>
+
+      <section class="panel draw-panel">
+        <div class="panel-heading">
+          <div><span class="step">02</span><h2>Розыгрыш</h2></div>
+          <button class="icon-button" id="resetRoundButton" type="button" title="Перемешать бочонки" aria-label="Перемешать бочонки">↻</button>
+        </div>
+
+        <div class="draw-settings">
+          <label class="field full"><span>Название приза</span><input id="prizeName" maxlength="80" placeholder="Например, главный приз"></label>
+          <fieldset>
+            <legend>Кто участвует</legend>
+            <div class="segmented">
+              <label><input type="radio" name="audience" value="present" checked><span>Только пришедшие</span></label>
+              <label><input type="radio" name="audience" value="all"><span>Все участники</span></label>
+            </div>
+          </fieldset>
+          <div class="settings-row">
+            <label class="field"><span>Пустых бочонков</span><input id="blankCount" type="number" min="0" max="100" value="3"></label>
+            <label class="field grow"><span>После выигрыша</span>
+              <select id="winnerPolicy">
+                <option value="person">Исключить человека</option>
+                <option value="ticket">Убрать выигравший билет</option>
+                <option value="none">Оставить всё как есть</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="barrel-stage" id="barrelStage">
+          <div class="spark spark-a">✦</div><div class="spark spark-b">✧</div>
+          <div class="barrel" id="barrel">
+            <div class="barrel-rim"></div>
+            <div class="barrel-body"><span id="barrelSymbol">?</span></div>
+          </div>
+          <p class="stage-kicker" id="stageKicker">Бочонки готовы</p>
+          <h3 id="stageTitle">Кто сегодня счастливчик?</h3>
+          <p id="stageText">Настройте розыгрыш и нажмите кнопку</p>
+        </div>
+
+        <button class="button primary draw-button" id="drawButton" type="button"><span>Вытянуть бочонок</span><small id="poolInfo">Добавьте участников</small></button>
+        <p class="fairness-note">Победитель выбирается генератором случайных чисел вашего браузера.</p>
+      </section>
+    </div>
+
+    <section class="panel history-panel">
+      <div class="panel-heading">
+        <div><span class="step">03</span><h2>История побед</h2></div>
+        <button class="text-button" id="clearHistoryButton" type="button">Очистить историю</button>
+      </div>
+      <div class="history-empty" id="historyEmpty">Здесь появятся результаты завершённых розыгрышей.</div>
+      <div class="history-list" id="historyList"></div>
+    </section>
+  </main>
+
+  <footer>Все данные хранятся только на этом устройстве · Никаких серверов и баз данных</footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
