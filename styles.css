@@ -184,28 +184,135 @@ h1 em::after { content: ""; position: absolute; left: 4%; right: 2%; bottom: -7p
 
 /* Маскот собран только из CSS-фигур, поэтому остаётся автономным. */
 .spooky-mascot { position: relative; height: 215px; filter: drop-shadow(0 22px 25px rgba(0,0,0,.35)); }
-.ghost-body {
+.creature-body {
   position: absolute;
-  right: 74px;
-  bottom: 5px;
-  width: 176px;
-  height: 172px;
+  z-index: 1;
+  right: 79px;
+  bottom: 13px;
+  width: 142px;
+  height: 145px;
   border: 5px solid var(--black-line);
-  border-radius: 50% 52% 42% 45%;
-  background: #e9efff;
+  border-radius: 46% 48% 42% 44%;
+  background: linear-gradient(145deg, #f8fbff 10%, #dce7fa 72%, #c7d3ed 100%);
   box-shadow: 8px 7px 0 var(--cyan), 14px 12px 0 var(--pink);
-  transform: rotate(6deg);
+  transform: rotate(4deg);
 }
-.ghost-body::before, .ghost-body::after { content: ""; position: absolute; top: -35px; width: 62px; height: 72px; background: #e9efff; border: 5px solid var(--black-line); z-index: -1; }
-.ghost-body::before { left: 11px; border-radius: 80% 10% 0 0; transform: rotate(-18deg); border-bottom: 0; }
-.ghost-body::after { right: 7px; border-radius: 10% 80% 0 0; transform: rotate(20deg); border-bottom: 0; }
-.ghost-body i { position: absolute; top: 67px; width: 24px; height: 31px; border: 4px solid var(--black-line); border-radius: 50%; background: #d7ff65; box-shadow: inset 7px 0 #596f2e; }
-.ghost-body i:first-child { left: 42px; transform: rotate(-5deg); }
-.ghost-body i:nth-child(2) { right: 42px; transform: rotate(5deg); }
-.ghost-body b { position: absolute; left: 68px; top: 108px; width: 42px; height: 26px; border: 4px solid var(--black-line); border-radius: 5px 5px 50% 50%; background: #572345; }
-.ghost-body b::after { content: ""; position: absolute; left: 10px; right: 6px; bottom: 2px; height: 8px; border-radius: 50%; background: var(--pink); }
-.ghost-body em { position: absolute; right: 18px; top: 27px; color: var(--orange); font-style: normal; font-size: 22px; }
-.ghost-tail { position: absolute; right: 40px; bottom: -5px; width: 150px; height: 65px; border: 5px solid var(--black-line); border-left: 0; border-radius: 0 0 80% 30%; background: #e9efff; transform: rotate(9deg); }
+.creature-body::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 18px;
+  right: 18px;
+  top: 16px;
+  height: 50px;
+  border: 4px solid var(--black-line);
+  border-radius: 55% 55% 40% 40%;
+  background: linear-gradient(160deg, #eaf0ff, #bdc9e2);
+  box-shadow: inset 0 -6px rgba(80, 76, 125, .12);
+}
+.creature-body::after { content: none; }
+.creature-antenna {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: -36px;
+  width: 27px;
+  height: 66px;
+  border: 5px solid var(--black-line);
+  border-bottom: 0;
+  border-radius: 60% 60% 0 0;
+  background: #e8efff;
+  transform: translateX(-50%) rotate(4deg);
+}
+.creature-antenna::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: -9px;
+  width: 26px;
+  height: 16px;
+  border: 5px solid var(--black-line);
+  border-left: 0;
+  border-radius: 0 90% 90% 0;
+  background: #e8efff;
+  transform: rotate(-12deg);
+}
+.creature-body .cyclops-eye {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 47px;
+  width: 54px;
+  height: 42px;
+  border: 5px solid var(--black-line);
+  border-radius: 48% 52% 50% 50%;
+  background: #fbfff2;
+  box-shadow: none;
+  transform: translateX(-50%) rotate(-2deg);
+}
+.cyclops-eye u {
+  position: absolute;
+  left: 18px;
+  top: 6px;
+  width: 17px;
+  height: 25px;
+  border: 3px solid var(--black-line);
+  border-radius: 50%;
+  background: #d7ff65;
+  box-shadow: inset 6px 0 #596f2e;
+  text-decoration: none;
+}
+.creature-body .creature-mouth {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 99px;
+  width: 29px;
+  height: 17px;
+  border: 4px solid var(--black-line);
+  border-radius: 5px 5px 50% 50%;
+  background: #572345;
+  transform: translateX(-50%);
+}
+.creature-body .creature-mouth::after { content: ""; position: absolute; left: 7px; right: 4px; bottom: 1px; height: 5px; border-radius: 50%; background: var(--pink); }
+.creature-body em { position: absolute; z-index: 3; right: 13px; top: 30px; color: var(--orange); font-style: normal; font-size: 17px; }
+.creature-loop {
+  position: absolute;
+  z-index: 0;
+  right: 54px;
+  bottom: 35px;
+  width: 198px;
+  height: 170px;
+  border: 17px solid #dce7fa;
+  border-bottom-color: transparent;
+  border-radius: 50% 55% 45% 50%;
+  filter: drop-shadow(5px 3px 0 var(--black-line)) drop-shadow(5px 4px 0 var(--cyan));
+  transform: rotate(-12deg);
+}
+.creature-arm {
+  position: absolute;
+  z-index: 2;
+  top: 86px;
+  width: 27px;
+  height: 72px;
+  border: 5px solid var(--black-line);
+  border-radius: 45% 45% 60% 60%;
+  background: #dce7fa;
+}
+.arm-left { left: -21px; transform: rotate(18deg); }
+.arm-right { right: -21px; transform: rotate(-18deg); }
+.creature-foot {
+  position: absolute;
+  z-index: 0;
+  bottom: -30px;
+  width: 29px;
+  height: 52px;
+  border: 5px solid var(--black-line);
+  border-radius: 45% 45% 60% 60%;
+  background: #dce7fa;
+}
+.foot-left { left: 25px; transform: rotate(13deg); }
+.foot-right { right: 25px; transform: rotate(-13deg); }
 .boo-sticker {
   position: absolute;
   z-index: 3;
