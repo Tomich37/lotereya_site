@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#130e2c">
+  <meta name="theme-color" content="#090820">
   <title>Счастливый бочонок — автономная лотерея</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="page-noise" aria-hidden="true"></div>
+  <div class="corner-web web-left" aria-hidden="true"></div>
+  <div class="corner-web web-right" aria-hidden="true"></div>
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
 
@@ -19,6 +22,13 @@
     <div class="offline-badge"><span></span> Работает без интернета</div>
   </header>
 
+  <div class="garland" aria-hidden="true">
+    <span class="flag flag-cream">×</span><span class="flag flag-orange">●</span>
+    <span class="flag flag-pink">◇</span><span class="flag flag-cream">×</span>
+    <span class="flag flag-cyan">●</span><span class="flag flag-orange">◇</span>
+    <span class="flag flag-pink">×</span><span class="flag flag-cream">●</span>
+  </div>
+
   <main class="page-shell">
     <section class="hero">
       <div>
@@ -26,10 +36,19 @@
         <h1>Добавьте людей.<br><em>Крутите бочонок.</em></h1>
         <p class="hero-copy">Количество билетов влияет на шанс, пустые бочонки добавляют интригу, а правила каждого приза настраиваются отдельно.</p>
       </div>
-      <div class="hero-stats" aria-label="Статистика лотереи">
-        <div><strong id="peopleCount">0</strong><span>участников</span></div>
-        <div><strong id="ticketCount">0</strong><span>билетов</span></div>
-        <div><strong id="presentCount">0</strong><span>пришли</span></div>
+      <div class="hero-side">
+        <div class="spooky-mascot" aria-hidden="true">
+          <span class="boo-sticker">BOO!</span>
+          <div class="ghost-tail"></div>
+          <div class="ghost-body"><i></i><i></i><b></b><em>✦</em></div>
+          <span class="pixel-star star-one">✦</span>
+          <span class="pixel-star star-two">＋</span>
+        </div>
+        <div class="hero-stats" aria-label="Статистика лотереи">
+          <div><strong id="peopleCount">0</strong><span>участников</span></div>
+          <div><strong id="ticketCount">0</strong><span>билетов</span></div>
+          <div><strong id="presentCount">0</strong><span>пришли</span></div>
+        </div>
       </div>
     </section>
 
