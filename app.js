@@ -27,6 +27,7 @@ const elements = {
   drawButton: document.querySelector('#drawButton'),
   poolInfo: document.querySelector('#poolInfo'),
   barrel: document.querySelector('#barrel'),
+  wheelLabels: document.querySelector('#wheelLabels'),
   barrelSymbol: document.querySelector('#barrelSymbol'),
   stage: document.querySelector('#barrelStage'),
   stageKicker: document.querySelector('#stageKicker'),
@@ -119,14 +120,97 @@ function startOrContinueRound() {
   return activeRound;
 }
 
+/* Рулетка показывает долю каждого участника пропорционально числу его билетов. */
+function buildWheelLayout(tokens) {
+  const palette = ['#ff5bae', '#23d8e7', '#ff8a3d', '#7864ff', '#ffd66b', '#7ee081', '#ff719a', '#41a9ff'];
+  const groups = new Map();
+
+  tokens.forEach((token) => {
+    const key = token.type === 'blank' ? 'blank' : token.personId;
+    if (!groups.has(key)) {
+      const person = state.participants.find((item) => item.id === token.personId);
+      groups.set(key, {
+        key,
+        label: token.type === 'blank' ? 'ПУСТО' : (person?.name || 'Билет'),
+        color: token.type === 'blank' ? '#4a456b' : palette[groups.size % palette.length],
+        count: 0
+      });
+    }
+    groups.get(key).count += 1;
+  });
+
+  const total = Math.max(tokens.length, 1);
+  let cursor = 0;
+  return [...groups.values()].map((group) => {
+    const start = cursor / total * 360;
+    cursor += group.count;
+    const end = cursor / total * 360;
+    return { ...group, start, end, middle: (start + end) / 2 };
+  });
+}
+
+function renderWheel(tokens) {
+  const layout = buildWheelLayout(tokens);
+  elements.barrel.style.transition = 'none';
+  elements.barrel.style.transform = 'rotate(0deg)';
+  elements.barrel.classList.remove('spinning');
+
+  if (!layout.length) {
+    elements.barrel.style.background = 'conic-gradient(#272354 0 45deg, #151438 45deg 90deg, #272354 90deg 135deg, #151438 135deg 180deg, #272354 180deg 225deg, #151438 225deg 270deg, #272354 270deg 315deg, #151438 315deg 360deg)';
+  } else {
+    const sectors = layout.map((group) => `${group.color} ${group.start}deg ${Math.max(group.start, group.end - 1.4)}deg, #09091e ${Math.max(group.start, group.end - 1.4)}deg ${group.end}deg`);
+    elements.barrel.style.background = `conic-gradient(${sectors.join(', ')})`;
+  }
+
+  elements.wheelLabels.replaceChildren(...layout
+    .filter((group) => layout.length <= 12 && group.end - group.start >= 16)
+    .map((group) => {
+      const label = document.createElement('span');
+      label.className = 'wheel-label';
+      label.textContent = group.label.length > 10 ? `${group.label.slice(0, 9)}…` : group.label;
+      label.style.setProperty('--angle', `${group.middle}deg`);
+      return label;
+    }));
+}
+
+async function spinWheel(tokens, tokenIndex) {
+  renderWheel(tokens);
+  elements.barrelSymbol.textContent = '✦';
+  void elements.barrel.offsetWidth;
+
+  const sectorAngle = (tokenIndex + .5) / tokens.length * 360;
+  const turns = 6 + secureIndex(3);
+  const rotation = turns * 360 - sectorAngle;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const duration = reducedMotion ? 450 : 4200 + secureIndex(600);
+  elements.barrel.style.transition = `transform ${duration}ms cubic-bezier(.12, .68, .08, 1)`;
+  elements.barrel.style.transform = `rotate(${rotation}deg)`;
+  elements.barrel.classList.add('spinning');
+
+  if (!reducedMotion) {
+    [250, 700, 1300, 2100, 3000, 3700].forEach((delay, index) => {
+      setTimeout(() => softSound(460 - index * 35, .045), delay);
+    });
+  }
+  await wait(duration + 120);
+  elements.barrel.classList.remove('spinning');
+}
+
 function resetRound(showMessage = true) {
   activeRound = null;
   elements.stage.className = 'barrel-stage';
   elements.barrelSymbol.textContent = '?';
-  elements.stageKicker.textContent = 'Бочонки готовы';
+  elements.drawButton.querySelector('span').textContent = 'Запустить рулетку';
+  elements.stageKicker.textContent = 'Рулетка готова';
   elements.stageTitle.textContent = 'Кто сегодня счастливчик?';
-  elements.stageText.textContent = 'Настройте розыгрыш и нажмите кнопку';
-  if (showMessage) toast('Бочонки перемешаны');
+  elements.stageText.textContent = 'Настройте розыгрыш и запустите колесо';
+  const previewTokens = participantTokens();
+  const blankCount = Math.max(0, Math.min(100, Number(elements.blankCount.value) || 0));
+  if (previewTokens.length) {
+    for (let index = 0; index < blankCount; index += 1) previewTokens.push({ type: 'blank', id: index });
+  }
+  renderWheel(previewTokens);
+  if (showMessage) toast('Рулетка перемешана');
   updatePoolInfo();
 }
 
@@ -147,10 +231,10 @@ function wordForm(number, forms) {
   return forms[2];
 }
 
-function setDrawing(isDrawing, buttonText = 'Вытянуть бочонок') {
+function setDrawing(isDrawing, buttonText = 'Запустить рулетку') {
   drawing = isDrawing;
   elements.drawButton.disabled = isDrawing || participantTokens().length === 0;
-  elements.drawButton.querySelector('span').textContent = isDrawing ? 'Бочонок крутится…' : buttonText;
+  elements.drawButton.querySelector('span').textContent = isDrawing ? 'Рулетка крутится…' : buttonText;
 }
 
 async function draw() {
@@ -159,26 +243,24 @@ async function draw() {
   const realTickets = round.tokens.filter((token) => token.type === 'ticket');
   if (!realTickets.length) {
     resetRound(false);
-    toast('В бочонке не осталось билетов');
+    toast('В рулетке не осталось билетов');
     return;
   }
 
+  const tokenIndex = secureIndex(round.tokens.length);
+  const token = round.tokens[tokenIndex];
   setDrawing(true);
   elements.stage.className = 'barrel-stage';
-  elements.stageKicker.textContent = 'Перемешиваем';
-  elements.stageTitle.textContent = 'Бочонок крутится…';
-  elements.stageText.textContent = 'Секунда — и узнаем результат';
-  elements.barrel.classList.remove('shake');
-  void elements.barrel.offsetWidth;
-  elements.barrel.classList.add('shake');
+  elements.stageKicker.textContent = 'Колесо запущено';
+  elements.stageTitle.textContent = 'Ловим удачу…';
+  elements.stageText.textContent = 'Стрелка уже выбирает сектор';
   tickSound();
-  await wait(760);
+  await spinWheel(round.tokens, tokenIndex);
 
-  const tokenIndex = secureIndex(round.tokens.length);
-  const [token] = round.tokens.splice(tokenIndex, 1);
+  round.tokens.splice(tokenIndex, 1);
   if (token.type === 'blank') {
     showBlank(round);
-    setDrawing(false, 'Тянуть следующий');
+    setDrawing(false, 'Крутить ещё раз');
   } else {
     showWinner(token);
     setDrawing(false);
@@ -189,7 +271,7 @@ async function draw() {
 function showBlank(round) {
   elements.stage.className = 'barrel-stage blank';
   elements.barrelSymbol.textContent = '—';
-  elements.stageKicker.textContent = 'Пустой бочонок';
+  elements.stageKicker.textContent = 'Пустой сектор';
   elements.stageTitle.textContent = 'Пока без победителя';
   elements.stageText.textContent = `Осталось пустых: ${round.tokens.filter((item) => item.type === 'blank').length}`;
   softSound(180, .08);
@@ -343,3 +425,4 @@ document.querySelectorAll('input[name="audience"]').forEach((input) => input.add
 elements.blankCount.addEventListener('change', () => resetRound(false));
 
 render();
+resetRound(false);

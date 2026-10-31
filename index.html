@@ -114,16 +114,20 @@
 
         <div class="barrel-stage" id="barrelStage">
           <div class="spark spark-a">✦</div><div class="spark spark-b">✧</div>
-          <div class="barrel" id="barrel">
-            <div class="barrel-rim"></div>
-            <div class="barrel-body"><span id="barrelSymbol">?</span></div>
+          <div class="roulette-shell">
+            <div class="roulette-pointer" aria-hidden="true"><span></span></div>
+            <div class="barrel roulette-wheel" id="barrel">
+              <div class="wheel-labels" id="wheelLabels" aria-hidden="true"></div>
+            </div>
+            <div class="wheel-center"><span id="barrelSymbol">?</span></div>
+            <div class="roulette-lights" aria-hidden="true"></div>
           </div>
           <p class="stage-kicker" id="stageKicker">Бочонки готовы</p>
           <h3 id="stageTitle">Кто сегодня счастливчик?</h3>
           <p id="stageText">Настройте розыгрыш и нажмите кнопку</p>
         </div>
 
-        <button class="button primary draw-button" id="drawButton" type="button"><span>Вытянуть бочонок</span><small id="poolInfo">Добавьте участников</small></button>
+        <button class="button primary draw-button" id="drawButton" type="button"><span>Запустить рулетку</span><small id="poolInfo">Добавьте участников</small></button>
         <p class="fairness-note">Победитель выбирается генератором случайных чисел вашего браузера.</p>
       </section>
     </div>
